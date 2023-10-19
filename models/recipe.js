@@ -1,0 +1,66 @@
+const mongoose = require("mongoose");
+
+const Schema = mongoose.Schema;
+
+const recipeSchema = new Schema({
+    name: {
+        type: String,
+        required: true
+    },
+    description: {
+        type: String,
+        required: true
+    },
+    ingredients:{
+        type: [String],
+        required: true
+    },
+    steps:{
+        type:[String],
+        required:true
+    },
+    cooking_time:{
+        type: Number,
+        required:true
+    },
+    meal_type:{
+        type:String,
+        required:true
+    },
+    nutritional_data:{
+        calories:{
+            type:Number,
+        },
+        carbohydrates:{
+            type:Number
+        },
+        fiber:{
+            type:Number
+        },
+        sugar:{
+            type:Number
+        },
+        fat:{
+            type:Number
+        },
+        saturated_fat:{
+            type:Number
+        },
+        trans_fat:{
+            type:Number
+        }
+    },
+    tags:{
+        type:[String]
+    },
+    image_url:{
+        type:String,
+        required:true
+    },
+    submitted_by:{
+        type:mongoose.Types.ObjectId,
+        ref:"User"
+    }
+})
+
+module.exports = mongoose.model("Recipe",recipeSchema)
