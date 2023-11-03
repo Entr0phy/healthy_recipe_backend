@@ -60,7 +60,33 @@ const recipeSchema = new Schema({
     submitted_by:{
         type:mongoose.Types.ObjectId,
         ref:"User"
+    },
+    likes:{
+        type: Number,
+        required: true
+    },
+    dislikes:{
+        type:Number,
+        required:true
+    },
+    comments: [
+        {
+            name: {
+                type:mongoose.Types.ObjectId,
+                ref: "User",
+                required: true,
+            },
+            comments:{
+                type: String,
+                required:true
+            }
+        }
+    ],
+    featured: {
+        type: Boolean,
+        required: true
     }
+
 })
 
 module.exports = mongoose.model("Recipe",recipeSchema)

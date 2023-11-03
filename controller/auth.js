@@ -28,6 +28,8 @@ exports.register = async (req, res) => {
       dietary_preferences: req.body.dietary_preferences,
       allergies: req.body.allergies,
       health_goals: req.body.health_goals,
+      favorite_recipes: [],
+      grocery_list: [],
     })
       .then((user) =>
         res.status(200).json({
@@ -60,12 +62,10 @@ exports.login = async (req, res) => {
     else {
       bcrypt.compare(password, user.password).then((match) => {
         if (match)
-          res.status(200).json(
-            {
-              message: "Log in successful",
-              user
-            },
-          );
+          res.status(200).json({
+            message: "Log in successful",
+            user,
+          });
         else {
           res.status(400).json({
             message: "Login not successful",
@@ -85,7 +85,7 @@ exports.login = async (req, res) => {
 //@desc   Get user by username
 //@route  GET /users/:username
 //@access private
-exports.getUserByUsername = (async (req, res) => {
+exports.getUserByUsername = async (req, res) => {
   const { username } = req.params;
   const user = await User.findOne({ username: username }).exec();
   if (!user)
@@ -93,4 +93,30 @@ exports.getUserByUsername = (async (req, res) => {
       message: "User",
     });
   res.status(200).json(user);
-});
+};
+
+//@desc   Edit user data
+//@route  PATCh /users/editUser
+//@access private
+exports.editUser = async (req, res) => {
+  const updatedUser = await User.findByIdAndUpdate(
+    { _id: req.body.id },
+    {
+      dietary_preferences: req.body.dietary_preferences,
+      allergies: req.body.allergies,
+      health_goals: req.body.health_goals,
+      favorite_recipes: req.body.favorite_recipes,
+      grocery_list: req.body.grocery_list,
+    }
+  );
+
+  res.status(200).json(updatedUser);
+};
+
+//@desc   DELETE a user
+//@route  DELETE /users/deleteUser
+//@access private
+exports.deleteUser = async (req, res) => {
+  const user = await User.findByIdAndDelete({ _id: req.body.id });
+  res.status(200).json(user);
+};
