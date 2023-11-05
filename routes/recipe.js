@@ -5,8 +5,15 @@ const router = express.Router();
 const recipeController = require("../controller/recipe")
 
 //recipe -> POST
-router.post('/add',recipeController.addNewRecipe)
+router.post('/addRecipe',recipeController.addNewRecipe)
+router.post('/addComment',recipeController.addComments)
 
 //recipe -> GET
 router.get("/getById/:id",recipeController.getRecipeById)
-module.exports = router
+router.get('/recipe',recipeController.getRecipe)
+
+//recipe -> PUT
+router.put("/editRecipe",recipeController.updateRecipeById)
+
+//recipe -> DELETE
+module.exports = router.delete("/deleteRecipe",recipeController.deleteRecipeById)

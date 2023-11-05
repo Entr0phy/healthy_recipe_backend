@@ -36,7 +36,18 @@ const userSchema = new Schema({
     favorite_recipes:[{
         type:mongoose.Types.ObjectId,
         ref:"Recipe"
-    }]
+    }],
+    grocery_list: [{
+        name: {
+            type: String,
+            required: true
+        },
+        quantity: {
+            type: Number,
+            required: true
+        }
+    }
+    ]
 })
 
 module.exports = mongoose.model("User",userSchema)

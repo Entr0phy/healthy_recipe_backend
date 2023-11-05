@@ -5,7 +5,7 @@ const User = require("../models/users");
 const bcrypt = require("bcryptjs");
 
 //@desc     Register a new user
-//@route    POST/register
+//@route    POST/user/register
 //@access   Public
 
 exports.register = async (req, res) => {
@@ -47,7 +47,7 @@ exports.register = async (req, res) => {
 };
 
 //@desc   Login a user
-//@route  POST/login
+//@route  POST/user/login
 //@access public
 exports.login = async (req, res) => {
   const { username, password } = req.body;
@@ -83,7 +83,7 @@ exports.login = async (req, res) => {
 };
 
 //@desc   Get user by username
-//@route  GET /users/:username
+//@route  GET /user/getUserByUsername/:username
 //@access private
 exports.getUserByUsername = async (req, res) => {
   const { username } = req.params;
@@ -114,9 +114,71 @@ exports.editUser = async (req, res) => {
 };
 
 //@desc   DELETE a user
-//@route  DELETE /users/deleteUser
+//@route  DELETE /user/deleteUser
 //@access private
 exports.deleteUser = async (req, res) => {
   const user = await User.findByIdAndDelete({ _id: req.body.id });
   res.status(200).json(user);
+};
+
+//@desc   Add items to grocery list
+//@route  POST /user/addToGroceryList
+//@acess  private
+exports.addToGroceryList = async (req, res) => {
+  const addToGroceryList = await User.findByIdAndUpdate(
+    { _id: req.body.id },
+    {
+      $push: {
+        grocery_list: {
+          name: req.body.name,
+          quantity: req.body.quantity,
+        },
+      },
+    }
+  );
+
+  if (!addToGroceryList) res.status(400).json({ error: err.message });
+
+  return res.status(200).json({ addToGroceryList });
+};
+
+//@desc   Remove item from grocery list
+//@route  DELETE /user/removeFromGroceryList
+//@access private
+
+//* Needs testing
+exports.removeFromGroceryList = async (req, res) => {
+  const removeFromGroceryList = await User.findByIdAndUpdate(
+    { _id: req.body.id },
+    {
+      $pullAll: {
+        grocery_list: [{ _id: req.body.id }],
+      },
+    }
+  );
+
+  if (!removeFromGroceryList) res.status(400).json({ error: err.message });
+
+  res.status(200).json({ removeFromGroceryList });
+};
+
+//@desc   Update item from grocery list
+//@route  PUT /user/updateGroceryList
+//@access private
+exports.editGroceryList = async (req, res) => {
+  const editGroceryList = await User.findByIdAndUpdate(
+    { _id: req.body.id },
+    {
+      $set: {
+        grocery_list: {
+          name: req.body.name,
+          quantity: req.body.quantity,
+        },
+      },
+    }
+  );
+
+  if (!editGroceryList) res.status(400).json({ error: err.message });
+
+  return res.status(200).json({ editGroceryList });
 };

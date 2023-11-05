@@ -4,7 +4,7 @@ const asyncHandler = require("express-async-handler");
 const Recipe = require("../models/recipe");
 
 //@desc     Register and add a new recipe
-//@route    POST/add
+//@route    POST/addRecipe
 //access    Private
 
 exports.addNewRecipe = async (req, res) => {
@@ -20,8 +20,7 @@ exports.addNewRecipe = async (req, res) => {
       tags: req.body.tags,
       image_url: req.body.image_url,
       submitted_by: req.body.submitted_by,
-      likes: 0,
-      dislikes: 0,
+      ratings: 0,
       comments: [],
       featured: false,
     }).then((result) => {
@@ -55,7 +54,7 @@ exports.getRecipeById = async (req, res) => {
   });
 };
 
-//@desc     Edit a recipe ny Id
+//@desc     Edit a recipe by Id
 //@route    PUT/editRecipe
 //@access   private
 
@@ -77,7 +76,7 @@ exports.updateRecipeById = async (req, res) => {
 };
 
 //@desc     Delete a recipe by Id
-//@route    DELETE/recipeById
+//@route    DELETE /deleteRecipe
 //@access   Private
 exports.deleteRecipeById = async (req, res) => {
   const recipe = await Recipe.findByIdAndDelete({
@@ -92,4 +91,59 @@ exports.deleteRecipeById = async (req, res) => {
   res.status(200).json({
     message: "Recipe deleted",
   });
+};
+
+//@desc   Add a comment to a recipe
+//@route  POST /addComment
+//@access private
+
+//needs testing**
+exports.addComments = async (req, res) => {
+  const addComment = await Recipe.findByIdAndRemove(
+    { _id: req.body.id },
+    {
+      $inc: { ratings: req.body.ratings },
+      $push: {
+        comments: {
+          name: req.body.name,
+          ratings: req.body.ratings,
+          comments: req.body.comments,
+        },
+      },
+    }
+  );
+
+  if (!comment)
+    res.status(400).json({
+      error: err.message,
+    });
+
+  res.status(200).json({
+    addComment,
+  });
+};
+
+//@desc   GET all recipe
+//@route  GET /recipe
+//@access public
+
+exports.getRecipe = async (req, res) => {
+  const recipe = await Recipe.find();
+  if (!recipe) res.status(400).json({ error: err.message });
+
+  res.status(200).json({ recipe });
+};
+
+//@desc   GET recipe by tags
+//@route  POST /recipeByTags
+//@access private
+
+//needs testing**
+exports.getRecipeByTags = async (req, res) => {
+  const recipe = await Recipe.find({
+    tags: { $in: req.body.tags },
+  });
+  if (!recipe) res.status(400).json({ error: err.message });
+
+  res.status(200).json({ recipe });
 };
