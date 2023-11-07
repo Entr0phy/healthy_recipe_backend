@@ -96,7 +96,7 @@ exports.getUserByUsername = async (req, res) => {
 };
 
 //@desc   Edit user data
-//@route  PATCh /users/editUser
+//@route  PATCh /user/updateUser
 //@access private
 exports.editUser = async (req, res) => {
   const updatedUser = await User.findByIdAndUpdate(
@@ -182,3 +182,77 @@ exports.editGroceryList = async (req, res) => {
 
   return res.status(200).json({ editGroceryList });
 };
+
+//@desc Add a following to the current user and add the current user as a follower to the other user
+//@route  POST /user/addFollowers
+//@access private
+
+//* Needs testing
+exports.addFollower = async (req, res) => {
+  const session = await mongoose.startSession();
+  try {
+    await User.findByIdAndUpdate(
+      { _id: req.body.currentUser },
+      {
+        $push: {
+          following: req.body.otherUser,
+        },
+      },
+      { session }
+    );
+
+    await User.findByIdAndUpdate(
+      { _id: req.body.otherUser },
+      {
+        $push: {
+          followers: req.body.currentUser,
+        },
+      },
+      { session }
+    );
+
+    await session.commitTransaction();
+  } catch (error) {
+    await session.abortTransaction();
+    throw error;
+  } finally {
+    session.endSession();
+  }
+};
+
+//@desc   Remove a following from current user and remove the current user from the other user followers
+//@route  DELETE /user/removeFollowers
+//@access private
+
+//* Needs testing
+exports.removeFollower = async (req, res) => {
+  const session = await mongoose.startSession();
+  try {
+    await User.findByIdAndUpdate(
+      { _id: req.body.currentUser },
+      {
+        $pullAll: {
+          _id: req.body.otherUser,
+        },
+      },
+      { session }
+    );
+
+    await User.findByIdAndUpdate(
+      { _id: req.body.otherUser },
+      {
+        $pullAll: {
+          _id: req.body.currentUser,
+        },
+      },
+      { session }
+    );
+
+    await session.commitTransaction();
+  } catch (error) {
+    await session.abortTransaction();
+    throw error;
+  } finally {
+    session.endSession();
+  }
+}
