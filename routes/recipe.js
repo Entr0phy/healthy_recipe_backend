@@ -7,7 +7,7 @@ const recipeController = require("../controller/recipe")
 //recipe -> POST
 router.post('/addRecipe',recipeController.addNewRecipe)
 router.post('/addComment',recipeController.addComments)
-
+router.post('/searchRecipe',recipeController.searchRecipe)
 //recipe -> GET
 router.get("/getById/:id",recipeController.getRecipeById)
 router.get('/recipe',recipeController.getRecipe)

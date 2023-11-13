@@ -25,11 +25,15 @@ exports.register = async (req, res) => {
       username: userName,
       password: hash,
       email: req.body.email,
+      created_at: new Date(),
       dietary_preferences: req.body.dietary_preferences,
       allergies: req.body.allergies,
       health_goals: req.body.health_goals,
       favorite_recipes: [],
       grocery_list: [],
+      followers: [],
+      following: [],
+      userType: 'user'
     })
       .then((user) =>
         res.status(200).json({

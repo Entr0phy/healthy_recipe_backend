@@ -147,3 +147,17 @@ exports.getRecipeByTags = async (req, res) => {
 
   res.status(200).json({ recipe });
 };
+
+exports.searchRecipe = async (req, res) => {
+  if (req.body.search === "") return res.status(200).json({ recipe: [] });
+  const sanitizedInput = req.body.search.replace(
+    /[-\/\\^$*+?.()|[\]{}]/g,
+    "\\$&"
+  );
+  const regex = new RegExp("^" + sanitizedInput, "i");
+
+  const recipe = await Recipe.find({ name: regex });
+  if (!recipe) res.status(400).json({ error: err.message });
+
+  res.status(200).json({ recipe });
+};
