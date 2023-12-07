@@ -23,6 +23,10 @@ const recipeSchema = new Schema({
     type: Number,
     required: true,
   },
+  prep_time: {
+    type: Number,
+    required: true,
+  },
   meal_type: {
     type: String,
     required: true,
@@ -34,19 +38,13 @@ const recipeSchema = new Schema({
     carbohydrates: {
       type: Number,
     },
-    fiber: {
+    sodium: {
       type: Number,
     },
-    sugar: {
+    protein: {
       type: Number,
     },
     fat: {
-      type: Number,
-    },
-    saturated_fat: {
-      type: Number,
-    },
-    trans_fat: {
       type: Number,
     },
   },
