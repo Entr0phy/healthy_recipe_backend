@@ -2,7 +2,6 @@ const mongoose = require("mongoose");
 const asyncHandler = require("express-async-handler");
 
 const Blog = require("../models/blog");
-const bcrypt = require("bcryptjs");
 
 //@desc     Add a new blog post
 //@route    POST/blog
