@@ -19,6 +19,8 @@ router.delete('/user/removeFromGroceryList',authController.removeFromGroceryList
 router.delete('/user/removeFollower',authController.removeFollower)
 
 //auth -> UPDATE
-router.put('/user/updateUser',authController.editUser)
+router.patch('/user/updateUserDietary',authController.editUserDietary)
+router.patch('/user/updateUserAllergies',authController.editUserAllergy)
+router.patch('/user/updateUserHealthGoals',authController.editUserHealthGoals)
 router.put('/user/updateGroceryList',authController.editGroceryList)
 module.exports = router

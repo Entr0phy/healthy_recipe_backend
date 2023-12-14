@@ -102,15 +102,39 @@ exports.getUserByUsername = async (req, res) => {
 //@desc   Edit user data
 //@route  PATCh /user/updateUser
 //@access private
-exports.editUser = async (req, res) => {
+exports.editUserDietary = async (req, res) => {
   const updatedUser = await User.findByIdAndUpdate(
     { _id: req.body.id },
     {
       dietary_preferences: req.body.dietary_preferences,
+    }
+  );
+
+  res.status(200).json(updatedUser);
+};
+
+//@desc   Edit user data
+//@route  PATCh /user/updateUser
+//@access private
+exports.editUserAllergy = async (req, res) => {
+  const updatedUser = await User.findByIdAndUpdate(
+    { _id: req.body.id },
+    {
       allergies: req.body.allergies,
+    }
+  );
+
+  res.status(200).json(updatedUser);
+};
+
+//@desc   Edit user data
+//@route  PATCh /user/updateUser
+//@access private
+exports.editUserHealthGoals = async (req, res) => {
+  const updatedUser = await User.findByIdAndUpdate(
+    { _id: req.body.id },
+    {
       health_goals: req.body.health_goals,
-      favorite_recipes: req.body.favorite_recipes,
-      grocery_list: req.body.grocery_list,
     }
   );
 
