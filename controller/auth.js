@@ -117,6 +117,7 @@ exports.editUserDietary = async (req, res) => {
 //@route  PATCh /user/updateUser
 //@access private
 exports.editUserAllergy = async (req, res) => {
+  
   const updatedUser = await User.findByIdAndUpdate(
     { _id: req.body.id },
     {
