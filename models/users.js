@@ -49,6 +49,10 @@ const userSchema = new Schema({
         type: Number,
         required: true,
       },
+      unitOfMeasure: {
+        type: String,
+        required:true
+      }
     },
   ],
   followers: [

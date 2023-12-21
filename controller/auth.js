@@ -117,7 +117,7 @@ exports.editUserDietary = async (req, res) => {
 //@route  PATCh /user/updateUser
 //@access private
 exports.editUserAllergy = async (req, res) => {
-  
+
   const updatedUser = await User.findByIdAndUpdate(
     { _id: req.body.id },
     {
@@ -152,24 +152,41 @@ exports.deleteUser = async (req, res) => {
 
 //@desc   Add items to grocery list
 //@route  POST /user/addToGroceryList
-//@acess  private
+//@access  private
 exports.addToGroceryList = async (req, res) => {
-  const addToGroceryList = await User.findByIdAndUpdate(
-    { _id: req.body.id },
-    {
-      $push: {
-        grocery_list: {
-          name: req.body.name,
-          quantity: req.body.quantity,
-        },
-      },
+  try {
+    const userId = req.body.id;
+    const groceryItems = req.body.groceryItems; // Assuming this is an array of items
+
+    const user = await User.findById(userId);
+    if (!user) {
+      return res.status(404).json({ error: "User not found" });
     }
-  );
 
-  if (!addToGroceryList) res.status(400).json({ error: err.message });
+    groceryItems.forEach(newItem => {
+      const existingItemIndex = user.grocery_list.findIndex(item => item.name === newItem.ingredientName);
 
-  return res.status(200).json({ addToGroceryList });
+      if (existingItemIndex > -1) {
+        // Item exists, update its quantity
+        user.grocery_list[existingItemIndex].quantity += newItem.quantity;
+      } else {
+        // Item does not exist, add new item
+        user.grocery_list.push({
+          name: newItem.ingredientName,
+          quantity: newItem.quantity,
+          unitOfMeasure: newItem.unitOfMeasure
+        });
+      }
+    });
+
+    await user.save();
+    return res.status(200).json({ grocery_list: user.grocery_list });
+
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
 };
+
 
 //@desc   Remove item from grocery list
 //@route  DELETE /user/removeFromGroceryList
@@ -177,11 +194,13 @@ exports.addToGroceryList = async (req, res) => {
 
 //* Needs testing
 exports.removeFromGroceryList = async (req, res) => {
-  const removeFromGroceryList = await User.findByIdAndUpdate(
+  console.log(req.body.id);
+  console.log(req.body.groceryId);
+  const removeFromGroceryList = await User.updateOne(
     { _id: req.body.id },
     {
-      $pullAll: {
-        grocery_list: [{ _id: req.body.id }],
+      $pull: {
+        grocery_list: { _id: req.body.groceryId },
       },
     }
   );

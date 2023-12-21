@@ -14,6 +14,7 @@ exports.addNewRecipe = async (req, res) => {
       description: req.body.description,
       ingredients: req.body.ingredients,
       steps: req.body.steps,
+      prep_time: req.body.prep_time,
       cooking_time: req.body.cooking_time,
       meal_type: req.body.meal_type,
       nutritional_data: req.body.nutritional_data,
@@ -43,7 +44,7 @@ exports.addNewRecipe = async (req, res) => {
 exports.getRecipeById = async (req, res) => {
   const recipe = await Recipe.find({
     _id: req.params.id,
-  });
+  }).populate("comments.name");
   if (!recipe)
     res.status(400).json({
       error: err.message,
@@ -99,7 +100,7 @@ exports.deleteRecipeById = async (req, res) => {
 
 //needs testing**
 exports.addComments = async (req, res) => {
-  const addComment = await Recipe.findByIdAndRemove(
+  const addComment = await Recipe.findByIdAndUpdate(
     { _id: req.body.id },
     {
       $inc: { ratings: req.body.ratings },
@@ -113,7 +114,7 @@ exports.addComments = async (req, res) => {
     }
   );
 
-  if (!comment)
+  if (!addComment)
     res.status(400).json({
       error: err.message,
     });
