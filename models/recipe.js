@@ -96,6 +96,11 @@ const recipeSchema = new Schema({
     type: Boolean,
     required: true,
   },
+  createdAt: {
+    type: Date,
+    default: Date.now(),
+    required:true
+  }
 });
 
 module.exports = mongoose.model("Recipe", recipeSchema);

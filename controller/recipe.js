@@ -162,3 +162,46 @@ exports.searchRecipe = async (req, res) => {
 
   res.status(200).json({ recipe });
 };
+
+//@desc   GET latest 3 recipes
+//@route  GET/latest3recipe
+//@access public
+
+exports.getLatest3Recipe = async (req, res) => {
+  const query = await Recipe.find()
+    .sort({ createdAt: -1 })
+    .limit(3)
+    .exec()
+
+  res.status(200).json({query})
+};
+
+//@desc   GET reconmended recipes
+//@route  GET /reconmendedRecipe
+//@access public
+
+exports.getReconmendedRecipes = async (req, res) => {
+  const query = await Recipe.find()
+  .limit(3)
+  .exec();
+
+  res.status(200).json({query})
+}
+
+//@desc   GET featured recipes
+//@route  GET/featuredRecipe
+//@access public
+
+exports.getFeaturedRecipes = async (req, res) => {
+  const query = await Recipe.find({featured:true})
+  .exec();
+
+  res.status(200).json({query})
+}
+
+exports.getMyFeedRecipes = async (req,res) => {
+  const query = await Recipe.find({submitted_by: req.body.id})
+  .exec();
+
+  res.status(200).json({query})
+}

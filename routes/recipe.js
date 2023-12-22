@@ -8,9 +8,13 @@ const recipeController = require("../controller/recipe")
 router.post('/addRecipe',recipeController.addNewRecipe)
 router.post('/addComment',recipeController.addComments)
 router.post('/searchRecipe',recipeController.searchRecipe)
+router.post('/myFeed',recipeController.getMyFeedRecipes)
 //recipe -> GET
 router.get("/getById/:id",recipeController.getRecipeById)
 router.get('/recipe',recipeController.getRecipe)
+router.get('/recipe3Latest',recipeController.getLatest3Recipe)
+router.get('/reconmendedRecipe',recipeController.getReconmendedRecipes);
+router.get('/featuredRecipe',recipeController.getFeaturedRecipes)
 
 //recipe -> PUT
 router.put("/editRecipe",recipeController.updateRecipeById)

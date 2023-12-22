@@ -12,9 +12,12 @@ const app = express();
 
 app.use(express.json())
 app.use(express.urlencoded({extended:false}));
-
 app.use(cors())
 app.get("/",function(req,res,next){})
+app.use('/proxy',(req, res) => {
+    const url = req.query.url;
+    request({url: url}).pipe(res);
+})
 
 //importing routes
 const authRoute = require("./routes/auth")
