@@ -33,7 +33,7 @@ exports.register = async (req, res) => {
       grocery_list: [],
       followers: [],
       following: [],
-      userType: 'user'
+      userType: "user",
     })
       .then((user) =>
         res.status(200).json({
@@ -91,13 +91,30 @@ exports.login = async (req, res) => {
 //@access private
 exports.getUserByUsername = async (req, res) => {
   const { username } = req.params;
-  const user = await User.findOne({ username: username }).exec();
+  const user = await User.findOne({ username: username })
+  .exec();
   if (!user)
     res.status(400).json({
       message: "User",
     });
   res.status(200).json(user);
 };
+
+//@desc   Get fav recipe of user
+//@route  GET /user/getUserByUsername/:username
+//@access private
+exports.getUserFavRecipe = async (req, res) => {
+  const { username } = req.params;
+  const user = await User.findOne({ username: username })
+  .populate('favorite_recipes')
+  .exec();
+  if (!user)
+    res.status(400).json({
+      message: "User",
+    });
+  res.status(200).json(user);
+};
+
 
 //@desc   Edit user data
 //@route  PATCh /user/updateUser
@@ -117,7 +134,6 @@ exports.editUserDietary = async (req, res) => {
 //@route  PATCh /user/updateUser
 //@access private
 exports.editUserAllergy = async (req, res) => {
-
   const updatedUser = await User.findByIdAndUpdate(
     { _id: req.body.id },
     {
@@ -163,8 +179,10 @@ exports.addToGroceryList = async (req, res) => {
       return res.status(404).json({ error: "User not found" });
     }
 
-    groceryItems.forEach(newItem => {
-      const existingItemIndex = user.grocery_list.findIndex(item => item.name === newItem.ingredientName);
+    groceryItems.forEach((newItem) => {
+      const existingItemIndex = user.grocery_list.findIndex(
+        (item) => item.name === newItem.ingredientName
+      );
 
       if (existingItemIndex > -1) {
         // Item exists, update its quantity
@@ -174,19 +192,17 @@ exports.addToGroceryList = async (req, res) => {
         user.grocery_list.push({
           name: newItem.ingredientName,
           quantity: newItem.quantity,
-          unitOfMeasure: newItem.unitOfMeasure
+          unitOfMeasure: newItem.unitOfMeasure,
         });
       }
     });
 
     await user.save();
     return res.status(200).json({ grocery_list: user.grocery_list });
-
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
 };
-
 
 //@desc   Remove item from grocery list
 //@route  DELETE /user/removeFromGroceryList
@@ -194,8 +210,6 @@ exports.addToGroceryList = async (req, res) => {
 
 //* Needs testing
 exports.removeFromGroceryList = async (req, res) => {
-  console.log(req.body.id);
-  console.log(req.body.groceryId);
   const removeFromGroceryList = await User.updateOne(
     { _id: req.body.id },
     {
@@ -303,4 +317,51 @@ exports.removeFollower = async (req, res) => {
   } finally {
     session.endSession();
   }
-}
+};
+
+//@desc   Add a recipe to favorite_recipes
+//@route  POST /user/addToFavorites
+//@access private
+exports.addToFavoriteRecipe = async (req, res) => {
+  const addToFav = await User.findByIdAndUpdate(
+    { _id: req.body.id },
+    {
+      $push: {
+        favorite_recipes: req.body.recipeId,
+      },
+    }
+  );
+
+  if (!addToFav)
+    res.status(400).json({
+      error: err.message,
+    });
+
+  res.status(200).json({
+    addToFav,
+  });
+};
+
+//@desc  Remove a recipe from favorite_recipes
+//@route  DELETE /user/removeFromFavorites
+//@access private
+exports.removeFromFavorite = async (req, res) => {
+  const removeFromFav = await User.updateOne(
+    {
+      _id: req.body.id,
+    },
+    {
+      $pull: { favorite_recipes: req.body.recipeId },
+    }
+  );
+
+  if (!removeFromFav)
+    res.status(400).json({
+      error: err.message,
+    });
+
+  res.status(200).json({
+    removeFromFav,
+  });
+
+};

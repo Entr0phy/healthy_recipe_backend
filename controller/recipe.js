@@ -81,7 +81,7 @@ exports.updateRecipeById = async (req, res) => {
 //@access   Private
 exports.deleteRecipeById = async (req, res) => {
   const recipe = await Recipe.findByIdAndDelete({
-    _id: req.params.id,
+    _id: req.body.id,
   });
 
   if (!recipe)
@@ -201,6 +201,13 @@ exports.getFeaturedRecipes = async (req, res) => {
 
 exports.getMyFeedRecipes = async (req,res) => {
   const query = await Recipe.find({submitted_by: req.body.id})
+  .exec();
+
+  res.status(200).json({query})
+}
+
+exports.getMyReviewedRecipes = async (req, res) => {
+  const query = await Recipe.find({ 'comments.name' : req.body.name })
   .exec();
 
   res.status(200).json({query})

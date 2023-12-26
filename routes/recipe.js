@@ -9,6 +9,7 @@ router.post('/addRecipe',recipeController.addNewRecipe)
 router.post('/addComment',recipeController.addComments)
 router.post('/searchRecipe',recipeController.searchRecipe)
 router.post('/myFeed',recipeController.getMyFeedRecipes)
+router.post('/getReviewedRecipe',recipeController.getMyReviewedRecipes)
 //recipe -> GET
 router.get("/getById/:id",recipeController.getRecipeById)
 router.get('/recipe',recipeController.getRecipe)
