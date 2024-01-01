@@ -21,4 +21,6 @@ router.get('/featuredRecipe',recipeController.getFeaturedRecipes)
 router.put("/editRecipe",recipeController.updateRecipeById)
 
 //recipe -> DELETE
-module.exports = router.delete("/deleteRecipe",recipeController.deleteRecipeById)
+router.delete("/deleteRecipe",recipeController.deleteRecipeById)
+router.delete('/deleteComment', recipeController.deleteComments)
+module.exports = router
