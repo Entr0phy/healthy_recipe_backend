@@ -132,7 +132,7 @@ exports.deleteComments = async (req, res) => {
   const deleteComment = await Recipe.findByIdAndUpdate(
     { _id: req.body.id },
     {
-      $inc: { ratings: - req.body.ratings }, 
+      $inc: { ratings: -req.body.ratings },
       $pull: {
         comments: { _id: req.body.commentId },
       },
@@ -164,29 +164,39 @@ exports.getRecipe = async (req, res) => {
 //@route  POST /recipeByTags
 //@access private
 
-//needs testing**
-exports.getRecipeByTags = async (req, res) => {
-  const recipe = await Recipe.find({
-    tags: { $in: req.body.tags },
-  });
-  if (!recipe) res.status(400).json({ error: err.message });
-
-  res.status(200).json({ recipe });
-};
-
 exports.searchRecipe = async (req, res) => {
-  if (req.body.search === "") return res.status(200).json({ recipe: [] });
-  const sanitizedInput = req.body.search.replace(
-    /[-\/\\^$*+?.()|[\]{}]/g,
-    "\\$&"
-  );
-  const regex = new RegExp("^" + sanitizedInput, "i");
+  try {
+      const query = {};
 
-  const recipe = await Recipe.find({ name: regex });
-  if (!recipe) res.status(400).json({ error: err.message });
+      // Add name search condition if search field is provided
+      if (req.body.search && req.body.search.trim() !== "") {
+          const sanitizedInput = req.body.search.replace(/[-\/\\^$*+?.()|[\]{}]/g, "\\$&");
+          const regex = new RegExp("^" + sanitizedInput, "i");
+          query.name = regex;
+      }
 
-  res.status(200).json({ recipe });
+      // Add tags condition if tags are provided
+      if (req.body.tags && req.body.tags.length) {
+          query.tags = { $in: req.body.tags };
+      }
+
+      let findQuery = Recipe.find(query);
+
+      // Add sorting if a sort field is provided
+      if (req.body.sort && req.body.sort.trim() !== "") {
+          findQuery = findQuery.sort(req.body.sort);
+      }
+
+      const recipe = await findQuery;
+
+      res.status(200).json({ recipe });
+  } catch (err) {
+      res.status(400).json({ error: err.message });
+  }
 };
+
+
+
 
 //@desc   GET latest 3 recipes
 //@route  GET/latest3recipe
