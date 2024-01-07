@@ -75,7 +75,7 @@ const userSchema = new Schema({
   ],
   userType: {
     type: String,
-    enum: ["user", "admin", "moderator"],
+    enum: ["user", "admin", "dietitian"],
     default: "user",
   },
 });

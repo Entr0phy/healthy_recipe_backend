@@ -100,6 +100,17 @@ exports.getUserByUsername = async (req, res) => {
   res.status(200).json(user);
 };
 
+exports.getUserById = async (req, res) => {
+  const { id } = req.params;
+  const user = await User.findOne({ _id: id })
+  .exec();
+  if (!user)
+    res.status(400).json({
+      message: "User",
+    });
+  res.status(200).json(user);
+}
+
 //@desc   Get fav recipe of user
 //@route  GET /user/getUserByUsername/:username
 //@access private

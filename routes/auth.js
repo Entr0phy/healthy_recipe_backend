@@ -14,6 +14,7 @@ router.post('/user/addToFav',authController.addToFavoriteRecipe)
 //auth -> GET
 router.get("/user/getUserByUsername/:username",authController.getUserByUsername)
 router.get("/user/getUserFavRecipe/:username",authController.getUserFavRecipe)
+router.get('/user/getUserById/:id',authController.getUserById)
 
 //auth -> DELETE
 router.delete("/user/deleteUser",authController.deleteUser)
