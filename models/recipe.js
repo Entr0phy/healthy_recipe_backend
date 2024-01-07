@@ -15,17 +15,17 @@ const recipeSchema = new Schema({
     {
       ingredientName: {
         type: String,
-        required: true
+        required: true,
       },
       quantity: {
         type: Number,
-        required:true
+        required: true,
       },
       unitOfMeasure: {
         type: String,
-        required: true
-      }
-    }
+        required: true,
+      },
+    },
   ],
   steps: {
     type: [String],
@@ -99,8 +99,32 @@ const recipeSchema = new Schema({
   createdAt: {
     type: Date,
     default: Date.now(),
-    required:true
-  }
+    required: true,
+  },
+  verificationStatus: {
+    type: Boolean,
+    required: true,
+  },
+  questions: [
+    {
+      questionName: {
+        type: mongoose.Types.ObjectId,
+        ref: "User",
+        required: true,
+      },
+      question: {
+        type: String,
+        required: true,
+      },
+      answerName: {
+        type: mongoose.Types.ObjectId,
+        ref: "User",
+      },
+      answer: {
+        type: String,
+      },
+    },
+  ],
 });
 
 module.exports = mongoose.model("Recipe", recipeSchema);

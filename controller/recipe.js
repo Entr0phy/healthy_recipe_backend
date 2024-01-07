@@ -24,6 +24,8 @@ exports.addNewRecipe = async (req, res) => {
       ratings: 0,
       comments: [],
       featured: false,
+      verificationStatus: req.body.verificationStatus,
+      questions: []
     }).then((result) => {
       res.status(200).json({
         message: "Recipe successfully added",
@@ -44,7 +46,7 @@ exports.addNewRecipe = async (req, res) => {
 exports.getRecipeById = async (req, res) => {
   const recipe = await Recipe.find({
     _id: req.params.id,
-  }).populate("comments.name");
+  }).populate("comments.name").populate("questions.questionName");
   if (!recipe)
     res.status(400).json({
       error: err.message,
@@ -166,37 +168,37 @@ exports.getRecipe = async (req, res) => {
 
 exports.searchRecipe = async (req, res) => {
   try {
-      const query = {};
+    const query = {};
 
-      // Add name search condition if search field is provided
-      if (req.body.search && req.body.search.trim() !== "") {
-          const sanitizedInput = req.body.search.replace(/[-\/\\^$*+?.()|[\]{}]/g, "\\$&");
-          const regex = new RegExp("^" + sanitizedInput, "i");
-          query.name = regex;
-      }
+    // Add name search condition if search field is provided
+    if (req.body.search && req.body.search.trim() !== "") {
+      const sanitizedInput = req.body.search.replace(
+        /[-\/\\^$*+?.()|[\]{}]/g,
+        "\\$&"
+      );
+      const regex = new RegExp("^" + sanitizedInput, "i");
+      query.name = regex;
+    }
 
-      // Add tags condition if tags are provided
-      if (req.body.tags && req.body.tags.length) {
-          query.tags = { $in: req.body.tags };
-      }
+    // Add tags condition if tags are provided
+    if (req.body.tags && req.body.tags.length) {
+      query.tags = { $in: req.body.tags };
+    }
 
-      let findQuery = Recipe.find(query);
+    let findQuery = Recipe.find(query);
 
-      // Add sorting if a sort field is provided
-      if (req.body.sort && req.body.sort.trim() !== "") {
-          findQuery = findQuery.sort(req.body.sort);
-      }
+    // Add sorting if a sort field is provided
+    if (req.body.sort && req.body.sort.trim() !== "") {
+      findQuery = findQuery.sort(req.body.sort);
+    }
 
-      const recipe = await findQuery;
+    const recipe = await findQuery;
 
-      res.status(200).json({ recipe });
+    res.status(200).json({ recipe });
   } catch (err) {
-      res.status(400).json({ error: err.message });
+    res.status(400).json({ error: err.message });
   }
 };
-
-
-
 
 //@desc   GET latest 3 recipes
 //@route  GET/latest3recipe
@@ -238,4 +240,31 @@ exports.getMyReviewedRecipes = async (req, res) => {
   const query = await Recipe.find({ "comments.name": req.body.name }).exec();
 
   res.status(200).json({ query });
+};
+
+//@desc   POST new question
+//@route  POST/question
+//@access private
+
+exports.postQuestion = async (req, res) => {
+  const askQuestion = await Recipe.findByIdAndUpdate(
+    { _id: req.body.id },
+    {
+      $push: {
+        questions: {
+          questionName: req.body.questionName,
+          question: req.body.question,
+        },
+      },
+    }
+  );
+
+  if (!askQuestion)
+    res.status(400).json({
+      error: err.message,
+    });
+
+  res.status(200).json({
+    askQuestion,
+  });
 };
