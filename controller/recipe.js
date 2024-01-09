@@ -25,7 +25,7 @@ exports.addNewRecipe = async (req, res) => {
       comments: [],
       featured: false,
       verificationStatus: req.body.verificationStatus,
-      questions: []
+      questions: [],
     }).then((result) => {
       res.status(200).json({
         message: "Recipe successfully added",
@@ -46,7 +46,9 @@ exports.addNewRecipe = async (req, res) => {
 exports.getRecipeById = async (req, res) => {
   const recipe = await Recipe.find({
     _id: req.params.id,
-  }).populate("comments.name").populate("questions.questionName");
+  })
+    .populate("comments.name")
+    .populate("questions.questionName");
   if (!recipe)
     res.status(400).json({
       error: err.message,
@@ -254,6 +256,8 @@ exports.postQuestion = async (req, res) => {
         questions: {
           questionName: req.body.questionName,
           question: req.body.question,
+          answer: "",
+          answerName: "",
         },
       },
     }
@@ -266,5 +270,57 @@ exports.postQuestion = async (req, res) => {
 
   res.status(200).json({
     askQuestion,
+  });
+};
+
+exports.postAnswer = async (req, res) => {
+  const postAnswer = await Recipe.updateOne(
+    { _id: req.body.id, "questions._id": req.body.recipeId },
+    {
+      $set: {
+        "questions.$.answer": req.body.answer,
+        "questions.$.answerName": req.body.answerName,
+      },
+    }
+  );
+
+  if (!postAnswer)
+    res.status(400).json({
+      error: err.message,
+    });
+
+  res.status(200).json({
+    postAnswer,
+  });
+};
+
+exports.getNotVerifiedRecipe = async (req, res) => {
+  const getNotVerifiedRecipe = await Recipe.find({
+    verificationStatus: false,
+  });
+
+  if (!getNotVerifiedRecipe)
+    res.status(400).json({
+      error: err.message,
+    });
+
+  res.status(200).json({
+    getNotVerifiedRecipe,
+  });
+};
+
+exports.verifyRecipe = async (req, res) => {
+  const verifyRecipe = await Recipe.findByIdAndUpdate(
+    { _id: req.body.id },
+    { verificationStatus: true }
+  );
+
+  if (!verifyRecipe)
+    res.status(400).json({
+      error: err.message,
+    });
+
+  res.status(200).json({
+    verifyRecipe,
   });
 };
