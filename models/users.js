@@ -51,8 +51,8 @@ const userSchema = new Schema({
       },
       unitOfMeasure: {
         type: String,
-        required:true
-      }
+        required: true,
+      },
     },
   ],
   followers: [
@@ -66,18 +66,28 @@ const userSchema = new Schema({
   ],
   following: [
     {
-        name: {
-          type: mongoose.Types.ObjectId,
-          ref: "User",
-          required: true,
-        },
+      name: {
+        type: mongoose.Types.ObjectId,
+        ref: "User",
+        required: true,
       },
+    },
   ],
   userType: {
     type: String,
     enum: ["user", "admin", "dietitian"],
     default: "user",
   },
+  qualifications: [
+    {
+      qualifications: {
+        type: String,
+      },
+      dateObtained: {
+        type: String,
+      },
+    },
+  ],
 });
 
 module.exports = mongoose.model("User", userSchema);

@@ -33,6 +33,7 @@ exports.register = async (req, res) => {
       grocery_list: [],
       followers: [],
       following: [],
+      qualifications: [],
       userType: "user",
     })
       .then((user) =>
@@ -91,8 +92,7 @@ exports.login = async (req, res) => {
 //@access private
 exports.getUserByUsername = async (req, res) => {
   const { username } = req.params;
-  const user = await User.findOne({ username: username })
-  .exec();
+  const user = await User.findOne({ username: username }).exec();
   if (!user)
     res.status(400).json({
       message: "User",
@@ -102,23 +102,7 @@ exports.getUserByUsername = async (req, res) => {
 
 exports.getUserById = async (req, res) => {
   const { id } = req.params;
-  const user = await User.findOne({ _id: id })
-  .exec();
-  if (!user)
-    res.status(400).json({
-      message: "User",
-    });
-  res.status(200).json(user);
-}
-
-//@desc   Get fav recipe of user
-//@route  GET /user/getUserByUsername/:username
-//@access private
-exports.getUserFavRecipe = async (req, res) => {
-  const { username } = req.params;
-  const user = await User.findOne({ username: username })
-  .populate('favorite_recipes')
-  .exec();
+  const user = await User.findOne({ _id: id }).exec();
   if (!user)
     res.status(400).json({
       message: "User",
@@ -126,6 +110,20 @@ exports.getUserFavRecipe = async (req, res) => {
   res.status(200).json(user);
 };
 
+//@desc   Get fav recipe of user
+//@route  GET /user/getUserByUsername/:username
+//@access private
+exports.getUserFavRecipe = async (req, res) => {
+  const { username } = req.params;
+  const user = await User.findOne({ username: username })
+    .populate("favorite_recipes")
+    .exec();
+  if (!user)
+    res.status(400).json({
+      message: "User",
+    });
+  res.status(200).json(user);
+};
 
 //@desc   Edit user data
 //@route  PATCh /user/updateUser
@@ -374,5 +372,30 @@ exports.removeFromFavorite = async (req, res) => {
   res.status(200).json({
     removeFromFav,
   });
+};
 
+//@desc Add qualification to a dietitian
+//@route POST /user/addQualification
+//@access private
+exports.addQualification = async (req, res) => {
+  const addQualification = await User.findByIdAndUpdate(
+    { _id: req.body.id },
+    {
+      $push: {
+        qualifications: {
+          qualifications: req.body.qualifications,
+          dateObtained: req.body.dateObtained,
+        },
+      },
+    }
+  );
+
+  if (!addQualification)
+    res.status(400).json({
+      error: err.message,
+    });
+
+  res.status(200).json({
+    addQualification,
+  });
 };

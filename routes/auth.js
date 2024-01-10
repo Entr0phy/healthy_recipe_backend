@@ -10,6 +10,7 @@ router.post('/user/login',authController.login)
 router.post('/user/addToGroceryList',authController.addToGroceryList)
 router.post('/user/addFollower',authController.addFollower)
 router.post('/user/addToFav',authController.addToFavoriteRecipe)
+router.post('/user/addQualification',authController.addQualification)
 
 //auth -> GET
 router.get("/user/getUserByUsername/:username",authController.getUserByUsername)
