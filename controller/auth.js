@@ -183,7 +183,7 @@ exports.addToGroceryList = async (req, res) => {
     const userId = req.body.id;
     const groceryItems = req.body.groceryItems; // Assuming this is an array of items
 
-    const user = await User.findById(userId);
+    const user = await User.findOne({_id:userId});
     if (!user) {
       return res.status(404).json({ error: "User not found" });
     }
@@ -217,7 +217,6 @@ exports.addToGroceryList = async (req, res) => {
 //@route  DELETE /user/removeFromGroceryList
 //@access private
 
-//* Needs testing
 exports.removeFromGroceryList = async (req, res) => {
   const removeFromGroceryList = await User.updateOne(
     { _id: req.body.id },
@@ -237,14 +236,11 @@ exports.removeFromGroceryList = async (req, res) => {
 //@route  PUT /user/updateGroceryList
 //@access private
 exports.editGroceryList = async (req, res) => {
-  const editGroceryList = await User.findByIdAndUpdate(
-    { _id: req.body.id },
+  const editGroceryList = await User.updateOne(
+    { _id: req.body.id},
     {
       $set: {
-        grocery_list: {
-          name: req.body.name,
-          quantity: req.body.quantity,
-        },
+        grocery_list: req.body.grocery_list
       },
     }
   );

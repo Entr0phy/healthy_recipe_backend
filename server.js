@@ -23,6 +23,7 @@ app.use('/proxy',(req, res) => {
 const authRoute = require("./routes/auth")
 const recipeRoute = require("./routes/recipe")
 const allergiesRoute = require('./routes/allergies');
+const shoppingRoute = require('./routes/shoppingList');
 //error handling
 app.use(errorHandler);
 
@@ -30,6 +31,7 @@ app.use(errorHandler);
 app.use("/auth",authRoute)
 app.use("/recipe",recipeRoute)
 app.use('/allergies',allergiesRoute)
+app.use('/shoppingList',shoppingRoute)
 app.listen(port, ()=>{
     console.log(`sever started on port ${port}`)
 })

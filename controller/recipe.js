@@ -48,7 +48,8 @@ exports.getRecipeById = async (req, res) => {
     _id: req.params.id,
   })
     .populate("comments.name")
-    .populate("questions.questionName");
+    .populate("questions.questionName")
+    .populate("submitted_by");
   if (!recipe)
     res.status(400).json({
       error: err.message,
