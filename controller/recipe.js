@@ -49,6 +49,7 @@ exports.getRecipeById = async (req, res) => {
   })
     .populate("comments.name")
     .populate("questions.questionName")
+    .populate('questions.answerName')
     .populate("submitted_by");
   if (!recipe)
     res.status(400).json({
@@ -325,3 +326,35 @@ exports.verifyRecipe = async (req, res) => {
     verifyRecipe,
   });
 };
+
+exports.setFeaturedRecipe = async (req, res) => {
+  const setFeatured = await Recipe.findByIdAndUpdate(
+    {_id: req.body.id},
+    {featured: true}
+  )
+
+  if (!setFeatured)
+    res.status(400).json({
+      error: err.message,
+    });
+
+  res.status(200).json({
+    setFeatured,
+  });
+}
+
+exports.removeFeaturedRecipe = async (req, res) => {
+  const setFeatured = await Recipe.findByIdAndUpdate(
+    {_id: req.body.id},
+    {featured: false}
+  )
+
+  if (!setFeatured)
+    res.status(400).json({
+      error: err.message,
+    });
+
+  res.status(200).json({
+    setFeatured,
+  });
+}

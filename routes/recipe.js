@@ -12,6 +12,8 @@ router.post('/myFeed',recipeController.getMyFeedRecipes)
 router.post('/getReviewedRecipe',recipeController.getMyReviewedRecipes)
 router.post('/postQuestion',recipeController.postQuestion)
 router.post('/postAnswer',recipeController.postAnswer)
+router.post('/setFeatured',recipeController.setFeaturedRecipe);
+router.post('/removeFeatured',recipeController.removeFeaturedRecipe)
 
 //recipe -> GET
 router.get("/getById/:id",recipeController.getRecipeById)
