@@ -34,7 +34,7 @@ exports.register = async (req, res) => {
       followers: [],
       following: [],
       qualifications: [],
-      userType: "user",
+      userType: req.body.userType,
     })
       .then((user) =>
         res.status(200).json({
@@ -92,7 +92,7 @@ exports.login = async (req, res) => {
 //@access private
 exports.getUserByUsername = async (req, res) => {
   const { username } = req.params;
-  const user = await User.findOne({ username: username }).exec();
+  const user = await User.findOne({ username: username }).populate('grocery_list.recipeId').exec();
   if (!user)
     res.status(400).json({
       message: "User",
@@ -189,8 +189,9 @@ exports.addToGroceryList = async (req, res) => {
     }
 
     groceryItems.forEach((newItem) => {
+      console.log(newItem);
       const existingItemIndex = user.grocery_list.findIndex(
-        (item) => item.name === newItem.ingredientName
+        (item) => item.recipeId == newItem.recipeId
       );
 
       if (existingItemIndex > -1) {
@@ -202,6 +203,7 @@ exports.addToGroceryList = async (req, res) => {
           name: newItem.ingredientName,
           quantity: newItem.quantity,
           unitOfMeasure: newItem.unitOfMeasure,
+          recipeId: newItem.recipeId
         });
       }
     });

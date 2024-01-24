@@ -41,9 +41,12 @@ exports.addToShoppingList = async (req, res) => {
 
 exports.getUserShoppingList = async (req, res) => {
   const { id } = req.params;
-  const shoppingList = await ShoppingList.find({
-    submitted_by: id,
-  });
+  const shoppingList = await ShoppingList.find(
+    {
+      submitted_by: id,
+
+    },
+  ).sort({'uploaded_at' : -1});
 
   if (!shoppingList)
     res.status(400).json({

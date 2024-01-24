@@ -53,6 +53,10 @@ const userSchema = new Schema({
         type: String,
         required: true,
       },
+      recipeId: {
+        type: mongoose.Types.ObjectId,
+        ref: 'Recipe'
+      }
     },
   ],
   followers: [

@@ -24,6 +24,7 @@ const authRoute = require("./routes/auth")
 const recipeRoute = require("./routes/recipe")
 const allergiesRoute = require('./routes/allergies');
 const shoppingRoute = require('./routes/shoppingList');
+const tagsRoute = require('./routes/tags')
 //error handling
 app.use(errorHandler);
 
@@ -32,6 +33,7 @@ app.use("/auth",authRoute)
 app.use("/recipe",recipeRoute)
 app.use('/allergies',allergiesRoute)
 app.use('/shoppingList',shoppingRoute)
+app.use('/tags',tagsRoute)
 app.listen(port, ()=>{
     console.log(`sever started on port ${port}`)
 })
