@@ -2,6 +2,7 @@ const mongoose = require("mongoose");
 const asyncHandler = require("express-async-handler");
 
 const Recipe = require("../models/recipe");
+const User = require("../models/users");
 
 //@desc     Register and add a new recipe
 //@route    POST/addRecipe
@@ -9,7 +10,7 @@ const Recipe = require("../models/recipe");
 
 exports.addNewRecipe = async (req, res) => {
   try {
-    await Recipe.create({
+    const createRecipe = Recipe.create({
       name: req.body.name,
       description: req.body.description,
       ingredients: req.body.ingredients,
@@ -26,11 +27,23 @@ exports.addNewRecipe = async (req, res) => {
       featured: false,
       verificationStatus: req.body.verificationStatus,
       questions: [],
-    }).then((result) => {
-      res.status(200).json({
-        message: "Recipe successfully added",
-        result,
-      });
+    });
+
+    let updateAchievementPromise = Promise.resolve(); // Initialize as a resolved promise
+
+    if (req.body.verificationStatus === false) {
+      // If verificationStatus is false, update the achievement
+      updateAchievementPromise = User.findByIdAndUpdate(
+        { _id: req.body.submitted_by },
+        { $inc: { "badges.customise": 1 } }
+      ).exec();
+    }
+
+    // Use Promise.all to wait for both createRecipe and updateAchievement (if applicable)
+    await Promise.all([createRecipe, updateAchievementPromise]);
+
+    res.status(200).json({
+      message: "Recipe added successfully.",
     });
   } catch (err) {
     res.status(400).json({
@@ -49,7 +62,7 @@ exports.getRecipeById = async (req, res) => {
   })
     .populate("comments.name")
     .populate("questions.questionName")
-    .populate('questions.answerName')
+    .populate("questions.answerName")
     .populate("submitted_by");
   if (!recipe)
     res.status(400).json({
@@ -106,29 +119,67 @@ exports.deleteRecipeById = async (req, res) => {
 //@access private
 
 exports.addComments = async (req, res) => {
-  const addComment = await Recipe.findByIdAndUpdate(
-    { _id: req.body.id },
-    {
-      $inc: { ratings: req.body.ratings },
-      $push: {
-        comments: {
-          name: req.body.name,
-          ratings: req.body.ratings,
-          comments: req.body.comments,
+  try {
+    const addComment = Recipe.findByIdAndUpdate(
+      { _id: req.body.id },
+      {
+        $inc: { ratings: req.body.ratings },
+        $push: {
+          comments: {
+            name: req.body.name,
+            ratings: req.body.ratings,
+            comments: req.body.comments,
+          },
         },
-      },
-    }
-  );
+      }
+    ).exec();
 
-  if (!addComment)
-    res.status(400).json({
-      error: err.message,
+    const user = req.body.userInfo;
+    const recipe = req.body.recipeInfo;
+    
+    const incrementObj = {
+      "badges.review": 1, // Always increment the review badge count
+    };
+
+    user.health_goals.includes("Lose Weight") &&
+    recipe.tags.includes("Low Calorie")
+      ? (incrementObj["badges.low_calorie"] = 1)
+      : null; // Use null to indicate no increment
+    user.health_goals.includes("Gain Muscle") &&
+    recipe.tags.includes("High Protein")
+      ? (incrementObj["badges.high_protein"] = 1)
+      : null;
+    user.health_goals.includes("Lower Blood Pressure") &&
+    recipe.tags.includes("Low Sodium")
+      ? (incrementObj["badges.low_sodium"] = 1)
+      : null;
+    user.health_goals.includes("Reduce Blood Sugar") &&
+    recipe.tags.includes("Low Sugar + Low GI")
+      ? (incrementObj["badges.low_sugarGI"] = 1)
+      : null;
+    user.health_goals.includes("Lower Cholesterol") &&
+    recipe.tags.includes("Low Fat")
+      ? (incrementObj["badges.low_fat"] = 1)
+      : null;
+
+    const updateBadges = User.findByIdAndUpdate(
+      { _id: user._id },
+      { $inc: incrementObj }
+    ).exec();
+
+    await Promise.all([addComment, updateBadges]);
+
+    res.status(200).json({
+      message: "Comment added and badges updated successfully.",
     });
-
-  res.status(200).json({
-    addComment,
-  });
+  } catch (err) {
+    console.log(err);
+    res.status(400).json({
+      message: err.message,
+    });
+  }
 };
+
 
 //@desc   DELETE a comment
 //@route  DELETE /deleteComment
@@ -195,7 +246,7 @@ exports.searchRecipe = async (req, res) => {
     if (req.body.sort && req.body.sort.trim() !== "") {
       findQuery = findQuery.sort(req.body.sort);
     }
-
+    console.log(req.body.search);
     const recipe = await findQuery;
 
     res.status(200).json({ recipe });
@@ -299,7 +350,7 @@ exports.postAnswer = async (req, res) => {
 exports.getNotVerifiedRecipe = async (req, res) => {
   const getNotVerifiedRecipe = await Recipe.find({
     verificationStatus: false,
-  });
+  }).populate("submitted_by");
 
   if (!getNotVerifiedRecipe)
     res.status(400).json({
@@ -312,26 +363,49 @@ exports.getNotVerifiedRecipe = async (req, res) => {
 };
 
 exports.verifyRecipe = async (req, res) => {
-  const verifyRecipe = await Recipe.findByIdAndUpdate(
-    { _id: req.body.id },
-    { verificationStatus: true }
-  );
+  try {
+    // Update the recipe's verificationStatus
+    const verifyRecipe = Recipe.findByIdAndUpdate(
+      { _id: req.body.id },
+      { verificationStatus: true }
+    ).exec();
 
-  if (!verifyRecipe)
-    res.status(400).json({
-      error: err.message,
+    // Update the user's badges
+    const updateAchievement = User.findByIdAndUpdate(
+      { _id: req.body.userId },
+      { $inc: { "badges.verify": 1 } }
+    ).exec();
+
+    // Wait for both updates to complete concurrently
+    const [recipeUpdateResult, userUpdateResult] = await Promise.all([
+      verifyRecipe,
+      updateAchievement,
+    ]);
+
+    // Check if both updates were successful
+    if (!recipeUpdateResult || !userUpdateResult) {
+      return res.status(400).json({
+        error: "Error updating recipe or user",
+      });
+    }
+
+    // Both updates were successful
+    return res.status(200).json({
+      message: "Recipe verified and badge updated successfully",
     });
-
-  res.status(200).json({
-    verifyRecipe,
-  });
+  } catch (error) {
+    console.error("Error:", error);
+    return res.status(500).json({
+      error: "Internal Server Error",
+    });
+  }
 };
 
 exports.setFeaturedRecipe = async (req, res) => {
   const setFeatured = await Recipe.findByIdAndUpdate(
-    {_id: req.body.id},
-    {featured: true}
-  )
+    { _id: req.body.id },
+    { featured: true }
+  );
 
   if (!setFeatured)
     res.status(400).json({
@@ -341,13 +415,13 @@ exports.setFeaturedRecipe = async (req, res) => {
   res.status(200).json({
     setFeatured,
   });
-}
+};
 
 exports.removeFeaturedRecipe = async (req, res) => {
   const setFeatured = await Recipe.findByIdAndUpdate(
-    {_id: req.body.id},
-    {featured: false}
-  )
+    { _id: req.body.id },
+    { featured: false }
+  );
 
   if (!setFeatured)
     res.status(400).json({
@@ -357,4 +431,4 @@ exports.removeFeaturedRecipe = async (req, res) => {
   res.status(200).json({
     setFeatured,
   });
-}
+};

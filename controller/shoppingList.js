@@ -22,6 +22,9 @@ exports.addToShoppingList = async (req, res) => {
           $set: {
             grocery_list: [],
           },
+          $inc: {
+            "badges.cart":1
+          }
         }
       );
 

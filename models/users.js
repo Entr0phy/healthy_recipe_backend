@@ -92,6 +92,53 @@ const userSchema = new Schema({
       },
     },
   ],
+  badges: {
+    low_calorie: {
+      type: Number,
+      required: true,
+      default: 0
+    },
+    high_protein: {
+      type: Number,
+      required: true,
+      default: 0
+    },
+    low_sodium: {
+      type: Number,
+      required: true,
+      default: 0
+    },
+    low_sugarGI: {
+      type: Number,
+      required:true,
+      default: 0
+    },
+    low_fat: {
+      type:Number,
+      required: true,
+      default:0
+    },
+    review: {
+      type: Number,
+      required: true,
+      default:0
+    },
+    customise: {
+      type: Number,
+      required: true,
+      default: 0
+    },
+    verify: {
+      type: Number,
+      required: true,
+      default:0
+    },
+    cart: {
+      type: Number,
+      requited: true,
+      default:0
+    }
+  }
 });
 
 module.exports = mongoose.model("User", userSchema);
