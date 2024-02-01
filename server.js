@@ -4,7 +4,7 @@ const connectDB = require("./config/db")
 const cors = require("cors")
 const {errorHandler} = require("./middleware/errorMiddleware")
 
-const port = process.env.port || 3000;
+const port = process.env.port || 10000;
 
 connectDB();
 
