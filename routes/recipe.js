@@ -19,7 +19,7 @@ router.post('/removeFeatured',recipeController.removeFeaturedRecipe)
 router.get("/getById/:id",recipeController.getRecipeById)
 router.get('/recipe',recipeController.getRecipe)
 router.get('/recipe3Latest',recipeController.getLatest3Recipe)
-router.get('/reconmendedRecipe',recipeController.getReconmendedRecipes);
+router.get('/reconmendedRecipe',recipeController.getRecommendedRecipes);
 router.get('/featuredRecipe',recipeController.getFeaturedRecipes)
 router.get('/notVerifiedRecipe',recipeController.getNotVerifiedRecipe)
 

@@ -269,11 +269,19 @@ exports.getLatest3Recipe = async (req, res) => {
 //@route  GET /reconmendedRecipe
 //@access public
 
-exports.getReconmendedRecipes = async (req, res) => {
-  const query = await Recipe.find().limit(3).exec();
+exports.getRecommendedRecipes = async (req, res) => {
+  try {
+    const randomRecipes = await Recipe.aggregate([
+      { $sample: { size: 3 } }
+    ]);
 
-  res.status(200).json({ query });
+    res.status(200).json(randomRecipes);
+  } catch (err) {
+    console.error("Error fetching random recipes:", err);
+    res.status(500).json({ message: "Failed to fetch random recipes" });
+  }
 };
+
 
 //@desc   GET featured recipes
 //@route  GET/featuredRecipe
