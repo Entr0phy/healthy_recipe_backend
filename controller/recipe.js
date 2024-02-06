@@ -46,6 +46,7 @@ exports.addNewRecipe = async (req, res) => {
       message: "Recipe added successfully.",
     });
   } catch (err) {
+    console.log(err);
     res.status(400).json({
       message: err.message,
     });
