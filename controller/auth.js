@@ -191,7 +191,7 @@ exports.addToGroceryList = async (req, res) => {
     groceryItems.forEach((newItem) => {
       console.log(newItem);
       const existingItemIndex = user.grocery_list.findIndex(
-        (item) => item.recipeId == newItem.recipeId
+        (item) => item.name == newItem.name
       );
 
       if (existingItemIndex > -1) {
