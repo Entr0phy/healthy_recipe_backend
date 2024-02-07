@@ -318,8 +318,6 @@ exports.postQuestion = async (req, res) => {
         questions: {
           questionName: req.body.questionName,
           question: req.body.question,
-          answer: "",
-          answerName: "",
         },
       },
     }
