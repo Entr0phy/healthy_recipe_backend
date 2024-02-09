@@ -22,6 +22,7 @@ router.get('/recipe3Latest',recipeController.getLatest3Recipe)
 router.get('/reconmendedRecipe',recipeController.getRecommendedRecipes);
 router.get('/featuredRecipe',recipeController.getFeaturedRecipes)
 router.get('/notVerifiedRecipe',recipeController.getNotVerifiedRecipe)
+router.get('/recipeLatest',recipeController.getLatestRecipe)
 
 //recipe -> PUT
 router.put("/editRecipe",recipeController.updateRecipeById)

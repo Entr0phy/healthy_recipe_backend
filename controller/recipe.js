@@ -261,7 +261,7 @@ exports.searchRecipe = async (req, res) => {
 //@access public
 
 exports.getLatest3Recipe = async (req, res) => {
-  const query = await Recipe.find().sort({ createdAt: -1 }).limit(3).exec();
+  const query = await Recipe.find({verificationStatus: true}).sort({ createdAt: -1 }).limit(3).exec();
 
   res.status(200).json({ query });
 };
@@ -438,4 +438,14 @@ exports.removeFeaturedRecipe = async (req, res) => {
   res.status(200).json({
     setFeatured,
   });
+};
+
+//@desc   GET latest recipes
+//@route  GET/latestRecipe
+//@access public
+
+exports.getLatestRecipe = async (req, res) => {
+  const query = await Recipe.find({verificationStatus: true}).sort({ createdAt: -1 }).exec();
+
+  res.status(200).json({ query });
 };
