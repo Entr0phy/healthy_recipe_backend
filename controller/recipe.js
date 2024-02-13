@@ -232,7 +232,7 @@ exports.searchRecipe = async (req, res) => {
         /[-\/\\^$*+?.()|[\]{}]/g,
         "\\$&"
       );
-      const regex = new RegExp("^" + sanitizedInput, "i");
+      const regex = new RegExp(sanitizedInput, "i");
       query.name = regex;
     }
 
@@ -247,7 +247,6 @@ exports.searchRecipe = async (req, res) => {
     if (req.body.sort && req.body.sort.trim() !== "") {
       findQuery = findQuery.sort(req.body.sort);
     }
-    console.log(req.body.search);
     const recipe = await findQuery;
 
     res.status(200).json({ recipe });
