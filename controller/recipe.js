@@ -272,6 +272,7 @@ exports.getLatest3Recipe = async (req, res) => {
 exports.getRecommendedRecipes = async (req, res) => {
   try {
     const randomRecipes = await Recipe.aggregate([
+      { $match: {verificationStatus: true}} ,
       { $sample: { size: 3 } }
     ]);
 
