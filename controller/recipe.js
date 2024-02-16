@@ -245,7 +245,8 @@ exports.searchRecipe = async (req, res) => {
 
     // Add sorting if a sort field is provided
     if (req.body.sort && req.body.sort.trim() !== "") {
-      findQuery = findQuery.sort(req.body.sort);
+      const sortField = req.body.sort === 'nutritional_data.calories' ? req.body.sort.trim() :  "-" + req.body.sort.trim();
+      findQuery = findQuery.sort(sortField);
     }
     const recipe = await findQuery;
 
